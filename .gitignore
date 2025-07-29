@@ -53,4 +53,14 @@ Temporary Items
 .history
 .ionide
 
+# Node
+*.log
+*.log.*
+node_modules
+
+out/
+dist/
+code.js
+
+
 # End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode
