@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: Inter, sans-serif;
+      padding: 24px;
+      margin: 0;
+      background-color: #fff;
+      color: #333;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+
+    .onboarding-msg {
+      background-color: #F5F5F5;
+      border-left: 4px solid #18A0FB;
+      padding: 12px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #444;
+    }
+
+    .button-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      background-color: #18A0FB;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 12px;
+      transition: background-color 0.2s ease-in-out;
+      margin-right: 8px;
+    }
+
+    .button-primary:disabled {
+      background-color: #A0A0A0;
+      cursor: not-allowed;
+    }
+
+    #jsonPreview {
+      margin-top: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #f9f9f9;
+      padding: 12px;
+      font-family: monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      max-height: 300px;
+      overflow: auto;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="section-title">🎨 색상 배포</div>
+  <div class="onboarding-msg">"Primary/100 과 같이 대소문자, /(슬래시)로 컬러들을 구분해주세요."</div>
+  
+  <button id="deployBtn" class="button-primary">
+    색상 배포하기
+  </button>
+  <button id="previewBtn" class="button-primary">
+    미리보기
+  </button>
+
+  <div id="jsonPreview"></div>
+
+  <script>
+    const deployBtn = document.getElementById('deployBtn');
+    const previewBtn = document.getElementById('previewBtn');
+    const jsonPreview = document.getElementById('jsonPreview');
+    let previewVisible = false;
+
+    deployBtn.onclick = () => {
+      deployBtn.disabled = true;
+
+      parent.postMessage({ pluginMessage: { type: 'deploy' } }, '*');
+
+      setTimeout(() => {
+        deployBtn.disabled = false;
+      }, 3000);
+    };
+
+    previewBtn.onclick = () => {
+      if (previewVisible) {
+        // Hide preview
+        jsonPreview.style.display = 'none';
+        previewVisible = false;
+        previewBtn.textContent = '미리보기';
+        parent.postMessage({ pluginMessage: { type: 'resize', height: 200 } }, '*');
+      } else {
+        // Request colors data from plugin
+        parent.postMessage({ pluginMessage: { type: 'preview' } }, '*');
+        parent.postMessage({ pluginMessage: { type: 'resize', height: 500 } }, '*');
+      }
+    };
+
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      if (msg.type === 'previewData' && msg.data) {
+        jsonPreview.textContent = msg.data;
+        jsonPreview.style.display = 'block';
+        previewVisible = true;
+        previewBtn.textContent = '미리보기 닫기';
+      }
+    };
+  </script>
+</body>
+</html>
