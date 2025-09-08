@@ -33,7 +33,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 8px 12px;
+      padding: 10px 14px;
       background-color: #18A0FB;
       border: none;
       border-radius: 6px;
@@ -50,7 +50,7 @@
       cursor: not-allowed;
     }
 
-    #jsonPreview {
+    #colorPreview, #fontPreview {
       margin-top: 16px;
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -67,44 +67,92 @@
 </head>
 <body>
   <div class="section-title">🎨 색상 배포</div>
-  <div class="onboarding-msg">"Primary/100 과 같이 대소문자, /(슬래시)로 컬러들을 구분해주세요."</div>
+  <div class="onboarding-msg">
+    - 색상명은 <b>영어</b>로 작성하며 <b>대문자</b>로 시작해주세요.<br>
+    - 컬러는 <b>숫자</b>로 표현해주세요.<br>
+    - ex) GrayScale/100, Red/200, Blue/300
+  </div>
   
-  <button id="deployBtn" class="button-primary">
+  <button id="Color" class="button-primary">
     색상 배포하기
   </button>
-  <button id="previewBtn" class="button-primary">
+  <button id="previewColorBtn" class="button-primary">
     미리보기
   </button>
 
-  <div id="jsonPreview"></div>
+  <div id="colorPreview"></div>
+
+  <div style="height: 20px;"></div> <!-- 공백 -->
+
+  <div class="section-title">🖋️ 폰트 배포</div>
+  <div class="onboarding-msg">
+    - 스타일은 <b>영어</b>로 작성하며 <b>대문자</b>로 시작해주세요.<br>
+    - 세부 종류는 스타일의 앞글자 + 1 같이 표현해주세요.<br>
+    - ex) Heading/H1, SubTitle/S2, Paragraph/P3
+  </div>
+
+  <button id="deployFontsBtn" class="button-primary">
+    폰트 배포하기
+  </button>
+  <button id="previewFontBtn" class="button-primary">
+    미리보기
+  </button>
+
+  <div id="fontPreview"></div>
 
   <script>
-    const deployBtn = document.getElementById('deployBtn');
-    const previewBtn = document.getElementById('previewBtn');
-    const jsonPreview = document.getElementById('jsonPreview');
-    let previewVisible = false;
+    const deployColorBtn = document.getElementById('Color');
+    const previewColorBtn = document.getElementById('previewColorBtn');
+    const deployFontsBtn = document.getElementById('deployFontsBtn');
+    const previewFontBtn = document.getElementById('previewFontBtn');
+    const colorPreview = document.getElementById('colorPreview');
+    const fontPreview = document.getElementById('fontPreview');
+    let previewColorVisible = false;
+    let previewFontVisible = false;
 
-    deployBtn.onclick = () => {
-      deployBtn.disabled = true;
+    Color.onclick = () => {
+      Color.disabled = true;
 
       parent.postMessage({ pluginMessage: { type: 'deploy' } }, '*');
 
       setTimeout(() => {
-        deployBtn.disabled = false;
+        Color.disabled = false;
       }, 3000);
     };
 
-    previewBtn.onclick = () => {
-      if (previewVisible) {
-        // Hide preview
-        jsonPreview.style.display = 'none';
-        previewVisible = false;
-        previewBtn.textContent = '미리보기';
-        parent.postMessage({ pluginMessage: { type: 'resize', height: 200 } }, '*');
-      } else {
-        // Request colors data from plugin
-        parent.postMessage({ pluginMessage: { type: 'preview' } }, '*');
+    previewColorBtn.onclick = () => {
+      if (previewColorVisible) {
+        // Hide Color Preview
+        colorPreview.style.display = 'none';
+        previewColorVisible = false;
+        previewColorBtn.textContent = '미리보기';
         parent.postMessage({ pluginMessage: { type: 'resize', height: 500 } }, '*');
+      } else {
+        // Show Color Preview with Data
+        parent.postMessage({ pluginMessage: { type: 'previewColor' } }, '*');
+        parent.postMessage({ pluginMessage: { type: 'resize', height: 1000 } }, '*');
+      }
+    };
+
+    deployFontsBtn.onclick = () => {
+      deployFontsBtn.disabled = true;
+      parent.postMessage({ pluginMessage: { type: 'deployFont' } }, '*');
+      setTimeout(() => {
+        deployFontsBtn.disabled = false;
+      }, 3000);
+    };
+
+    previewFontBtn.onclick = () => {
+      if (previewFontVisible) {
+        // Hide Font Preview
+        fontPreview.style.display = 'none';
+        previewFontBtn.textContent = '미리보기';
+        previewFontVisible = false;
+        parent.postMessage({ pluginMessage: { type: 'resize', height: 500 } }, '*');
+      } else {
+        // Show Font Preview with Data
+        parent.postMessage({ pluginMessage: { type: 'previewFont' } }, '*');
+        parent.postMessage({ pluginMessage: { type: 'resize', height: 1000 } }, '*');
       }
     };
 
@@ -112,11 +160,18 @@
       const msg = event.data.pluginMessage;
       if (!msg) return;
 
-      if (msg.type === 'previewData' && msg.data) {
-        jsonPreview.textContent = msg.data;
-        jsonPreview.style.display = 'block';
-        previewVisible = true;
-        previewBtn.textContent = '미리보기 닫기';
+      if (msg.type === 'previewColorData' && msg.data) {
+        colorPreview.textContent = msg.data;
+        colorPreview.style.display = 'block';
+        previewColorVisible = true;
+        previewColorBtn.textContent = '미리보기 닫기';
+      }
+
+      if (msg.type === 'previewFontData' && msg.data) {
+        fontPreview.textContent = msg.data;
+        fontPreview.style.display = 'block';
+        previewFontVisible = true;
+        previewFontBtn.textContent = '미리보기 닫기';
       }
     };
   </script>

@@ -10,47 +10,79 @@ function toHex(color: RGB) {
   );
 }
 
-async function getColorStyles() {
-  const styles = await figma.getLocalPaintStylesAsync();
-  const colors = [];
+async function getColorVariables() {
+  const variables = await figma.variables.getLocalVariablesAsync('COLOR');
 
-  for (const style of styles) {
-    const paints = style.paints;
+  return variables.map(variable => {
+    const themeIdMap: Record<string, string> = {};
+    themeIdMap['Value'] = Object.keys(variable.valuesByMode)[0];
 
-    // 색상 정의(paints)가 1개만 존재하고,
-    // 타입이 "SOLID"인 경우에만 유효한 색상으로 판단해 처리합니다.
-    if (paints.length !== 1 || paints[0].type !== 'SOLID') continue;
+    const defaultColor = variable.valuesByMode[themeIdMap['Value']];
+    return {
+      name: variable.name,
+      hex: toHex(defaultColor as RGB),
+    };
+  });
+}
 
-    colors.push({
-      name: style.name, // Figma에서 지정한 스타일 이름 ("Primary/500" 등)
-      hex: toHex(paints[0].color)
-    });
-  }
-
-  return colors;
+async function getFontStyles() {
+  const styles = await figma.getLocalTextStylesAsync();
+  return styles.map(style => ({
+    name: style.name,
+    fontFamily: style.fontName.family,
+    fontStyle: style.fontName.style,
+    fontSize: style.fontSize,
+    lineHeight:
+      typeof style.lineHeight === 'number'
+      ? style.lineHeight
+      : style.lineHeight.unit === 'PIXELS'
+        ? style.lineHeight.value
+        : undefined, // FIXME: "130%" 이렇게 와서 여기로 빠지는듯
+    letterSpacing:
+      typeof style.letterSpacing === 'number' 
+      ? style.letterSpacing 
+      : style.letterSpacing.value,
+  }));
 }
 
 figma.ui.onmessage = async (msg) => {
-  if (msg.type === 'deploy') {
-    const colors = await getColorStyles();
-    const payload = JSON.stringify([{ colors }]);
+  if (msg.type === 'deployColor') {
+    const colors = await getColorVariables();
+    const payload = JSON.stringify({ colors });
     console.log(payload);
     
-    await fetch('https://nklcb.xyz/api/post-color', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: payload
-    });
+    // await fetch('https://nklcb.xyz/api/post-color', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: payload
+    // });
     figma.notify('✅ 색상 정보가 전송되었습니다!');
   } 
-  else if (msg.type === 'preview') {
-    const colors = await getColorStyles();
-    const json = JSON.stringify(colors, null, 2);
-    figma.ui.postMessage({ type: 'previewData', data: json });
+  else if (msg.type === 'deployFont') {
+    const fonts = await getFontStyles();
+    const payload = JSON.stringify({ fonts });
+    console.log(payload);
+    
+    // await fetch('https://nklcb.xyz/api/post-font', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: payload
+    // });
+    figma.notify('✅ 폰트 정보가 전송되었습니다!');
+  } 
+  else if (msg.type === 'previewColor') {
+    const colors = await getColorVariables();
+    const json = JSON.stringify({ colors }, null, 2);
+    figma.ui.postMessage({ type: 'previewColorData', data: json });
+  } 
+  else if (msg.type === 'previewFont') {
+    const font = await getFontStyles();
+    const json = JSON.stringify({ font }, null, 2);
+    figma.ui.postMessage({ type: 'previewFontData', data: json });
   } 
   else if (msg.type === 'resize') {
-    figma.ui.resize(300, msg.height);
+    figma.ui.resize(350, msg.height);
   }
 };
 
-figma.showUI(__html__, { width: 300, height: 200 });
+figma.showUI(__html__, { width: 350, height: 500 });
