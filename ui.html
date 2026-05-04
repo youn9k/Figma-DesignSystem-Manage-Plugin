@@ -3,111 +3,329 @@
 <head>
   <meta charset="UTF-8" />
   <style>
+    :root {
+      --bg-top: #f1f8ff;
+      --bg-bottom: #eef2ff;
+      --card: #ffffff;
+      --card-strong: #f8fbff;
+      --line: #d9e3f2;
+      --ink: #132238;
+      --muted: #5f6f87;
+      --primary: #0ea5e9;
+      --primary-strong: #0369a1;
+      --accent: #f97316;
+      --preview-bg: #0b1321;
+      --preview-line: #1d2a3f;
+      --preview-ink: #dce7f9;
+      --success-bg: #e8f8ef;
+      --success-ink: #17623b;
+      --error-bg: #fdebec;
+      --error-ink: #9f2632;
+      --loading-bg: #fff4df;
+      --loading-ink: #9a5f00;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: Inter, sans-serif;
-      padding: 24px;
       margin: 0;
-      background-color: #fff;
-      color: #333;
+      padding: 20px;
+      font-family: 'Pretendard Variable', 'SUIT Variable', 'SF Pro Display',
+        'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(120% 75% at 0% 0%, #dff3ff 0%, transparent 58%),
+        radial-gradient(120% 75% at 100% 0%, #e7e8ff 0%, transparent 60%),
+        linear-gradient(165deg, var(--bg-top), var(--bg-bottom));
+      min-height: 100vh;
       font-size: 12px;
-      line-height: 1.4;
+      line-height: 1.5;
+    }
+
+    .app-shell {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(4px);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow:
+        0 14px 30px rgba(14, 40, 90, 0.08),
+        0 2px 6px rgba(11, 19, 33, 0.04);
+    }
+
+    .hero {
+      margin-bottom: 12px;
+    }
+
+    .hero-title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #0a1a33;
+    }
+
+    .hero-sub {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .status {
+      margin: 0 0 12px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background: #eef4ff;
+      color: #34527a;
+      font-size: 11px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    .status.loading {
+      background: var(--loading-bg);
+      border-color: #ffdca3;
+      color: var(--loading-ink);
+    }
+
+    .status.success {
+      background: var(--success-bg);
+      border-color: #bae5ca;
+      color: var(--success-ink);
+    }
+
+    .status.error {
+      background: var(--error-bg);
+      border-color: #f5c8ce;
+      color: var(--error-ink);
+    }
+
+    .section {
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, var(--card), var(--card-strong));
+      border-radius: 12px;
+      padding: 12px;
+    }
+
+    .section + .section {
+      margin-top: 12px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
     }
 
     .section-title {
+      margin: 0;
       font-size: 14px;
-      font-weight: 600;
-      margin-bottom: 16px;
+      line-height: 1.2;
+      font-weight: 700;
+      color: #122845;
     }
 
-    .onboarding-msg {
-      background-color: #f5f5f5;
-      border-left: 4px solid #18a0fb;
-      padding: 12px;
-      margin-bottom: 16px;
-      border-radius: 4px;
-      font-size: 12px;
-      color: #444;
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      color: #27466f;
+      background: #f2f7ff;
+      white-space: nowrap;
     }
 
-    .button-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 14px;
-      background-color: #18a0fb;
+    .hint {
+      margin: 0;
+      padding-left: 16px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn {
       border: none;
-      border-radius: 6px;
-      color: white;
-      font-weight: 500;
-      cursor: pointer;
+      border-radius: 10px;
       font-size: 12px;
-      transition: background-color 0.2s ease-in-out;
-      margin-right: 8px;
+      font-weight: 700;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+      min-height: 38px;
     }
 
-    .button-primary:hover {
-      background-color: #1490e0;
+    .btn:hover {
+      transform: translateY(-1px);
     }
 
-    .button-primary:disabled {
-      background-color: #a0a0a0;
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(120deg, var(--primary), var(--primary-strong));
+      box-shadow: 0 6px 14px rgba(14, 165, 233, 0.24);
+    }
+
+    .btn-secondary {
+      color: #173154;
+      background: #edf5ff;
+      border: 1px solid #cfe0f8;
+    }
+
+    .preview-wrap {
+      margin-top: 10px;
+      border: 1px solid var(--preview-line);
+      border-radius: 10px;
+      overflow: hidden;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .preview-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #111f33;
+      color: #bcd1ef;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .copy-btn {
+      border: 1px solid #3b4f6d;
+      background: #1a2a42;
+      color: #d9e6fb;
+      border-radius: 7px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .copy-btn:disabled {
+      opacity: 0.5;
       cursor: not-allowed;
     }
 
-    .button-primary:disabled:hover {
-      background-color: #a0a0a0;
+    .preview {
+      margin: 0;
+      background: var(--preview-bg);
+      color: var(--preview-ink);
+      font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas,
+        'Liberation Mono', monospace;
+      font-size: 11px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 320px;
+      overflow: auto;
+      padding: 10px;
     }
 
-    #colorPreview,
-    #fontPreview {
-      margin-top: 16px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      background-color: #f9f9f9;
-      padding: 12px;
-      font-family: monospace;
-      font-size: 12px;
-      white-space: pre-wrap;
-      max-height: 300px;
-      overflow: auto;
-      display: none;
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="section-title">🎨 색상 토큰 추출</div>
-  <div class="onboarding-msg">
-    - 색상명은 <b>영어</b>로 작성하며 <b>대문자</b>로 시작해주세요.<br>
-    - 컬러는 <b>숫자</b>로 표현해주세요.<br>
-    - ex) GrayScale/100, Red/200, Blue/300
+  <div class="app-shell">
+    <header class="hero">
+      <h1 class="hero-title">Token Exporter</h1>
+      <p class="hero-sub">컬러/폰트 토큰을 JSON으로 추출합니다.</p>
+    </header>
+
+    <p id="statusBar" class="status">준비 완료. 원하는 토큰 타입을 선택하세요.</p>
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">🎨 색상 토큰</h2>
+        <span class="badge">Colors</span>
+      </div>
+      <ul class="hint">
+        <li>색상명은 영어로 작성하고 규칙을 일관되게 유지하세요.</li>
+        <li>컬렉션/그룹 네이밍은 프로젝트 컨벤션에 맞춰주세요.</li>
+      </ul>
+
+      <div class="actions">
+        <button id="downloadColorBtn" class="btn btn-primary">JSON 다운로드</button>
+        <button id="previewColorBtn" class="btn btn-secondary">미리보기</button>
+      </div>
+
+      <div id="colorPreviewWrap" class="preview-wrap" hidden>
+        <div class="preview-head">
+          <span>color-tokens.json</span>
+          <button id="copyColorBtn" class="copy-btn">복사</button>
+        </div>
+        <pre id="colorPreview" class="preview"></pre>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-head">
+        <h2 class="section-title">🖋️ 폰트 토큰</h2>
+        <span class="badge">Typography</span>
+      </div>
+      <ul class="hint">
+        <li>스타일명은 계층 구조와 의도를 알 수 있게 작성하세요.</li>
+        <li>스타일 단위와 naming convention을 맞춰 관리하세요.</li>
+      </ul>
+
+      <div class="actions">
+        <button id="downloadFontBtn" class="btn btn-primary">JSON 다운로드</button>
+        <button id="previewFontBtn" class="btn btn-secondary">미리보기</button>
+      </div>
+
+      <div id="fontPreviewWrap" class="preview-wrap" hidden>
+        <div class="preview-head">
+          <span>font-tokens.json</span>
+          <button id="copyFontBtn" class="copy-btn">복사</button>
+        </div>
+        <pre id="fontPreview" class="preview"></pre>
+      </div>
+    </section>
   </div>
-
-  <button id="downloadColorBtn" class="button-primary">색상 JSON 다운로드</button>
-  <button id="previewColorBtn" class="button-primary">미리보기</button>
-
-  <div id="colorPreview"></div>
-
-  <div style="height: 20px;"></div>
-
-  <div class="section-title">🖋️ 폰트 토큰 추출</div>
-  <div class="onboarding-msg">
-    - 스타일은 <b>영어</b>로 작성하며 <b>대문자</b>로 시작해주세요.<br>
-    - 세부 종류는 스타일의 앞글자 + 1 같이 표현해주세요.<br>
-    - ex) Heading/H1, SubTitle/S2, Paragraph/P3
-  </div>
-
-  <button id="downloadFontBtn" class="button-primary">폰트 JSON 다운로드</button>
-  <button id="previewFontBtn" class="button-primary">미리보기</button>
-
-  <div id="fontPreview"></div>
 
   <script>
     const downloadColorBtn = document.getElementById('downloadColorBtn');
     const previewColorBtn = document.getElementById('previewColorBtn');
     const downloadFontBtn = document.getElementById('downloadFontBtn');
     const previewFontBtn = document.getElementById('previewFontBtn');
+    const copyColorBtn = document.getElementById('copyColorBtn');
+    const copyFontBtn = document.getElementById('copyFontBtn');
+    const colorPreviewWrap = document.getElementById('colorPreviewWrap');
+    const fontPreviewWrap = document.getElementById('fontPreviewWrap');
     const colorPreview = document.getElementById('colorPreview');
     const fontPreview = document.getElementById('fontPreview');
+    const statusBar = document.getElementById('statusBar');
 
     let previewColorVisible = false;
     let previewFontVisible = false;
@@ -123,6 +341,18 @@
       return `${yyyy}${mm}${dd}-${hh}${min}${sec}`;
     }
 
+    function setStatus(message, tone) {
+      statusBar.textContent = message;
+      statusBar.className = tone ? `status ${tone}` : 'status';
+    }
+
+    function requestResize() {
+      requestAnimationFrame(() => {
+        const target = Math.max(540, Math.min(1240, document.body.scrollHeight + 20));
+        parent.postMessage({ pluginMessage: { type: 'resize', height: target } }, '*');
+      });
+    }
+
     function downloadJson(filename, data) {
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
@@ -136,76 +366,123 @@
       URL.revokeObjectURL(url);
     }
 
+    function updatePreviewVisibility() {
+      colorPreviewWrap.hidden = !previewColorVisible;
+      fontPreviewWrap.hidden = !previewFontVisible;
+      previewColorBtn.textContent = previewColorVisible ? '미리보기 닫기' : '미리보기';
+      previewFontBtn.textContent = previewFontVisible ? '미리보기 닫기' : '미리보기';
+      requestResize();
+    }
+
+    function copyText(text, button) {
+      if (!text) {
+        setStatus('복사할 내용이 없습니다. 먼저 미리보기를 불러오세요.', 'error');
+        return;
+      }
+
+      if (!navigator.clipboard || !navigator.clipboard.writeText) {
+        setStatus('현재 환경에서 클립보드 복사가 지원되지 않습니다.', 'error');
+        return;
+      }
+
+      button.disabled = true;
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          setStatus('미리보기 JSON을 클립보드에 복사했습니다.', 'success');
+        })
+        .catch(() => {
+          setStatus('클립보드 복사에 실패했습니다.', 'error');
+        })
+        .finally(() => {
+          button.disabled = false;
+        });
+    }
+
     downloadColorBtn.onclick = () => {
       downloadColorBtn.disabled = true;
+      setStatus('색상 토큰을 수집 중입니다...', 'loading');
       parent.postMessage({ pluginMessage: { type: 'downloadColor' } }, '*');
     };
 
     downloadFontBtn.onclick = () => {
       downloadFontBtn.disabled = true;
+      setStatus('폰트 토큰을 수집 중입니다...', 'loading');
       parent.postMessage({ pluginMessage: { type: 'downloadFont' } }, '*');
     };
 
     previewColorBtn.onclick = () => {
       if (previewColorVisible) {
-        colorPreview.style.display = 'none';
         previewColorVisible = false;
-        previewColorBtn.textContent = '미리보기';
-        parent.postMessage({ pluginMessage: { type: 'resize', height: 500 } }, '*');
-      } else {
-        parent.postMessage({ pluginMessage: { type: 'previewColor' } }, '*');
-        parent.postMessage({ pluginMessage: { type: 'resize', height: 1000 } }, '*');
+        setStatus('색상 미리보기를 닫았습니다.', null);
+        updatePreviewVisibility();
+        return;
       }
+
+      setStatus('색상 미리보기를 불러오는 중입니다...', 'loading');
+      parent.postMessage({ pluginMessage: { type: 'previewColor' } }, '*');
     };
 
     previewFontBtn.onclick = () => {
       if (previewFontVisible) {
-        fontPreview.style.display = 'none';
-        previewFontBtn.textContent = '미리보기';
         previewFontVisible = false;
-        parent.postMessage({ pluginMessage: { type: 'resize', height: 500 } }, '*');
-      } else {
-        parent.postMessage({ pluginMessage: { type: 'previewFont' } }, '*');
-        parent.postMessage({ pluginMessage: { type: 'resize', height: 1000 } }, '*');
+        setStatus('폰트 미리보기를 닫았습니다.', null);
+        updatePreviewVisibility();
+        return;
       }
+
+      setStatus('폰트 미리보기를 불러오는 중입니다...', 'loading');
+      parent.postMessage({ pluginMessage: { type: 'previewFont' } }, '*');
     };
+
+    copyColorBtn.onclick = () => copyText(colorPreview.textContent, copyColorBtn);
+    copyFontBtn.onclick = () => copyText(fontPreview.textContent, copyFontBtn);
 
     window.onmessage = (event) => {
       const msg = event.data.pluginMessage;
       if (!msg) return;
 
       if (msg.type === 'downloadColorData' && msg.data) {
-        downloadJson(`color-tokens-${buildTimestamp()}.json`, msg.data);
+        const filename = `color-tokens-${buildTimestamp()}.json`;
+        downloadJson(filename, msg.data);
         downloadColorBtn.disabled = false;
+        setStatus(`색상 JSON 다운로드 완료: ${filename}`, 'success');
       }
 
       if (msg.type === 'downloadColorError') {
         downloadColorBtn.disabled = false;
+        setStatus('색상 JSON 생성에 실패했습니다.', 'error');
       }
 
       if (msg.type === 'downloadFontData' && msg.data) {
-        downloadJson(`font-tokens-${buildTimestamp()}.json`, msg.data);
+        const filename = `font-tokens-${buildTimestamp()}.json`;
+        downloadJson(filename, msg.data);
         downloadFontBtn.disabled = false;
+        setStatus(`폰트 JSON 다운로드 완료: ${filename}`, 'success');
       }
 
       if (msg.type === 'downloadFontError') {
         downloadFontBtn.disabled = false;
+        setStatus('폰트 JSON 생성에 실패했습니다.', 'error');
       }
 
       if (msg.type === 'previewColorData' && msg.data) {
         colorPreview.textContent = msg.data;
-        colorPreview.style.display = 'block';
         previewColorVisible = true;
-        previewColorBtn.textContent = '미리보기 닫기';
+        setStatus('색상 미리보기를 표시했습니다.', 'success');
+        updatePreviewVisibility();
       }
 
       if (msg.type === 'previewFontData' && msg.data) {
         fontPreview.textContent = msg.data;
-        fontPreview.style.display = 'block';
         previewFontVisible = true;
-        previewFontBtn.textContent = '미리보기 닫기';
+        setStatus('폰트 미리보기를 표시했습니다.', 'success');
+        updatePreviewVisibility();
       }
     };
+
+    window.onresize = requestResize;
+    requestResize();
   </script>
 </body>
 </html>
