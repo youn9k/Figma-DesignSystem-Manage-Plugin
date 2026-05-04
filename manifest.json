@@ -9,10 +9,5 @@
   "editorType": [
     "figma"
   ],
-  "ui": "ui.html",
-  "networkAccess": {
-    "allowedDomains": [
-      "https://nklcb.xyz"
-    ]
-  }
+  "ui": "ui.html"
 }

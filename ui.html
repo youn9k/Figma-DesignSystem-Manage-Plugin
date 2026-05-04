@@ -20,8 +20,8 @@
     }
 
     .onboarding-msg {
-      background-color: #F5F5F5;
-      border-left: 4px solid #18A0FB;
+      background-color: #f5f5f5;
+      border-left: 4px solid #18a0fb;
       padding: 12px;
       margin-bottom: 16px;
       border-radius: 4px;
@@ -34,7 +34,7 @@
       align-items: center;
       gap: 6px;
       padding: 10px 14px;
-      background-color: #18A0FB;
+      background-color: #18a0fb;
       border: none;
       border-radius: 6px;
       color: white;
@@ -45,12 +45,21 @@
       margin-right: 8px;
     }
 
+    .button-primary:hover {
+      background-color: #1490e0;
+    }
+
     .button-primary:disabled {
-      background-color: #A0A0A0;
+      background-color: #a0a0a0;
       cursor: not-allowed;
     }
 
-    #colorPreview, #fontPreview {
+    .button-primary:disabled:hover {
+      background-color: #a0a0a0;
+    }
+
+    #colorPreview,
+    #fontPreview {
       margin-top: 16px;
       border: 1px solid #ccc;
       border-radius: 4px;
@@ -66,91 +75,96 @@
   </style>
 </head>
 <body>
-  <div class="section-title">🎨 색상 배포</div>
+  <div class="section-title">🎨 색상 토큰 추출</div>
   <div class="onboarding-msg">
     - 색상명은 <b>영어</b>로 작성하며 <b>대문자</b>로 시작해주세요.<br>
     - 컬러는 <b>숫자</b>로 표현해주세요.<br>
     - ex) GrayScale/100, Red/200, Blue/300
   </div>
-  
-  <button id="Color" class="button-primary">
-    색상 배포하기
-  </button>
-  <button id="previewColorBtn" class="button-primary">
-    미리보기
-  </button>
+
+  <button id="downloadColorBtn" class="button-primary">색상 JSON 다운로드</button>
+  <button id="previewColorBtn" class="button-primary">미리보기</button>
 
   <div id="colorPreview"></div>
 
-  <div style="height: 20px;"></div> <!-- 공백 -->
+  <div style="height: 20px;"></div>
 
-  <div class="section-title">🖋️ 폰트 배포</div>
+  <div class="section-title">🖋️ 폰트 토큰 추출</div>
   <div class="onboarding-msg">
     - 스타일은 <b>영어</b>로 작성하며 <b>대문자</b>로 시작해주세요.<br>
     - 세부 종류는 스타일의 앞글자 + 1 같이 표현해주세요.<br>
     - ex) Heading/H1, SubTitle/S2, Paragraph/P3
   </div>
 
-  <button id="deployFontsBtn" class="button-primary">
-    폰트 배포하기
-  </button>
-  <button id="previewFontBtn" class="button-primary">
-    미리보기
-  </button>
+  <button id="downloadFontBtn" class="button-primary">폰트 JSON 다운로드</button>
+  <button id="previewFontBtn" class="button-primary">미리보기</button>
 
   <div id="fontPreview"></div>
 
   <script>
-    const deployColorBtn = document.getElementById('Color');
+    const downloadColorBtn = document.getElementById('downloadColorBtn');
     const previewColorBtn = document.getElementById('previewColorBtn');
-    const deployFontsBtn = document.getElementById('deployFontsBtn');
+    const downloadFontBtn = document.getElementById('downloadFontBtn');
     const previewFontBtn = document.getElementById('previewFontBtn');
     const colorPreview = document.getElementById('colorPreview');
     const fontPreview = document.getElementById('fontPreview');
+
     let previewColorVisible = false;
     let previewFontVisible = false;
 
-    Color.onclick = () => {
-      Color.disabled = true;
+    function buildTimestamp() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, '0');
+      const dd = String(now.getDate()).padStart(2, '0');
+      const hh = String(now.getHours()).padStart(2, '0');
+      const min = String(now.getMinutes()).padStart(2, '0');
+      const sec = String(now.getSeconds()).padStart(2, '0');
+      return `${yyyy}${mm}${dd}-${hh}${min}${sec}`;
+    }
 
-      parent.postMessage({ pluginMessage: { type: 'deploy' } }, '*');
+    function downloadJson(filename, data) {
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
 
-      setTimeout(() => {
-        Color.disabled = false;
-      }, 3000);
+      anchor.href = url;
+      anchor.download = filename;
+      document.body.appendChild(anchor);
+      anchor.click();
+      anchor.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    downloadColorBtn.onclick = () => {
+      downloadColorBtn.disabled = true;
+      parent.postMessage({ pluginMessage: { type: 'downloadColor' } }, '*');
+    };
+
+    downloadFontBtn.onclick = () => {
+      downloadFontBtn.disabled = true;
+      parent.postMessage({ pluginMessage: { type: 'downloadFont' } }, '*');
     };
 
     previewColorBtn.onclick = () => {
       if (previewColorVisible) {
-        // Hide Color Preview
         colorPreview.style.display = 'none';
         previewColorVisible = false;
         previewColorBtn.textContent = '미리보기';
         parent.postMessage({ pluginMessage: { type: 'resize', height: 500 } }, '*');
       } else {
-        // Show Color Preview with Data
         parent.postMessage({ pluginMessage: { type: 'previewColor' } }, '*');
         parent.postMessage({ pluginMessage: { type: 'resize', height: 1000 } }, '*');
       }
     };
 
-    deployFontsBtn.onclick = () => {
-      deployFontsBtn.disabled = true;
-      parent.postMessage({ pluginMessage: { type: 'deployFont' } }, '*');
-      setTimeout(() => {
-        deployFontsBtn.disabled = false;
-      }, 3000);
-    };
-
     previewFontBtn.onclick = () => {
       if (previewFontVisible) {
-        // Hide Font Preview
         fontPreview.style.display = 'none';
         previewFontBtn.textContent = '미리보기';
         previewFontVisible = false;
         parent.postMessage({ pluginMessage: { type: 'resize', height: 500 } }, '*');
       } else {
-        // Show Font Preview with Data
         parent.postMessage({ pluginMessage: { type: 'previewFont' } }, '*');
         parent.postMessage({ pluginMessage: { type: 'resize', height: 1000 } }, '*');
       }
@@ -159,6 +173,24 @@
     window.onmessage = (event) => {
       const msg = event.data.pluginMessage;
       if (!msg) return;
+
+      if (msg.type === 'downloadColorData' && msg.data) {
+        downloadJson(`color-tokens-${buildTimestamp()}.json`, msg.data);
+        downloadColorBtn.disabled = false;
+      }
+
+      if (msg.type === 'downloadColorError') {
+        downloadColorBtn.disabled = false;
+      }
+
+      if (msg.type === 'downloadFontData' && msg.data) {
+        downloadJson(`font-tokens-${buildTimestamp()}.json`, msg.data);
+        downloadFontBtn.disabled = false;
+      }
+
+      if (msg.type === 'downloadFontError') {
+        downloadFontBtn.disabled = false;
+      }
 
       if (msg.type === 'previewColorData' && msg.data) {
         colorPreview.textContent = msg.data;

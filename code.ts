@@ -46,29 +46,29 @@ async function getFontStyles() {
 }
 
 figma.ui.onmessage = async (msg) => {
-  if (msg.type === 'deployColor') {
-    const colors = await getColorVariables();
-    const payload = JSON.stringify({ colors });
-    console.log(payload);
-    
-    // await fetch('https://nklcb.xyz/api/post-color', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: payload
-    // });
-    figma.notify('✅ 색상 정보가 전송되었습니다!');
+  if (msg.type === 'downloadColor') {
+    try {
+      const colors = await getColorVariables();
+      const json = JSON.stringify({ colors }, null, 2);
+      figma.ui.postMessage({ type: 'downloadColorData', data: json });
+      figma.notify('✅ 색상 JSON이 준비되었습니다.');
+    } catch (error) {
+      figma.ui.postMessage({ type: 'downloadColorError' });
+      figma.notify('❌ 색상 JSON 생성에 실패했습니다.', { error: true });
+      console.error('Download colors error:', error);
+    }
   } 
-  else if (msg.type === 'deployFont') {
-    const fonts = await getFontStyles();
-    const payload = JSON.stringify({ fonts });
-    console.log(payload);
-    
-    // await fetch('https://nklcb.xyz/api/post-font', {
-    //   method: 'POST',
-    //   headers: { 'Content-Type': 'application/json' },
-    //   body: payload
-    // });
-    figma.notify('✅ 폰트 정보가 전송되었습니다!');
+  else if (msg.type === 'downloadFont') {
+    try {
+      const fonts = await getFontStyles();
+      const json = JSON.stringify({ fonts }, null, 2);
+      figma.ui.postMessage({ type: 'downloadFontData', data: json });
+      figma.notify('✅ 폰트 JSON이 준비되었습니다.');
+    } catch (error) {
+      figma.ui.postMessage({ type: 'downloadFontError' });
+      figma.notify('❌ 폰트 JSON 생성에 실패했습니다.', { error: true });
+      console.error('Download fonts error:', error);
+    }
   } 
   else if (msg.type === 'previewColor') {
     const colors = await getColorVariables();
@@ -76,8 +76,8 @@ figma.ui.onmessage = async (msg) => {
     figma.ui.postMessage({ type: 'previewColorData', data: json });
   } 
   else if (msg.type === 'previewFont') {
-    const font = await getFontStyles();
-    const json = JSON.stringify({ font }, null, 2);
+    const fonts = await getFontStyles();
+    const json = JSON.stringify({ fonts }, null, 2);
     figma.ui.postMessage({ type: 'previewFontData', data: json });
   } 
   else if (msg.type === 'resize') {
